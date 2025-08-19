@@ -10,6 +10,11 @@ Claude Code UI is a full-featured web interface for Anthropic's Claude Code CLI,
 - Visual project browser with metadata and session counts
 - Project actions: rename, delete, organize
 - Real-time project synchronization via WebSocket
+- **Empty Folder Filtering** (New):
+  - Automatically hides project folders with 0 sessions
+  - Toggle button (Eye/EyeOff icon) to show/hide empty folders
+  - User preference saved in localStorage
+  - Helps keep sidebar clean and focused on active projects
 
 ### 2. **Chat Interface**
 - Real-time streaming responses from Claude

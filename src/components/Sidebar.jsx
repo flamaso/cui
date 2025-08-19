@@ -59,7 +59,7 @@ function Sidebar({
   const [additionalSessions, setAdditionalSessions] = useState({});
   const [initialSessionsLoaded, setInitialSessionsLoaded] = useState(new Set());
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [projectSortOrder, setProjectSortOrder] = useState('name');
+  const [projectSortOrder, setProjectSortOrder] = useState('date');
   const [sessionSortOrder, setSessionSortOrder] = useState(() => {
     const saved = localStorage.getItem('sessionSortOrder');
     return saved || 'time';
@@ -72,6 +72,7 @@ function Sidebar({
   const [showEmptyFolders, setShowEmptyFolders] = useState(() => {
     return localStorage.getItem('showEmptyFolders') === 'true';
   });
+  const [autoExpandedSessions, setAutoExpandedSessions] = useState(new Set());
 
   
   // Starred projects state - persisted in localStorage
@@ -124,12 +125,21 @@ function Sidebar({
   useEffect(() => {
     if (projects.length > 0 && !isLoading) {
       const newLoaded = new Set();
+      const newAutoExpanded = new Set();
       projects.forEach(project => {
         if (project.sessions && project.sessions.length >= 0) {
           newLoaded.add(project.name);
         }
+        // Auto-expand the most recent session for each project
+        const allSessions = getAllSessions(project);
+        if (allSessions.length > 0) {
+          // The first session is the most recent (already sorted by time)
+          const mostRecentSession = allSessions[0];
+          newAutoExpanded.add(`${project.name}-${mostRecentSession.id}`);
+        }
       });
       setInitialSessionsLoaded(newLoaded);
+      setAutoExpandedSessions(newAutoExpanded);
     }
   }, [projects, isLoading]);
 
@@ -1021,11 +1031,11 @@ function Sidebar({
                   </div>
 
                   {/* Sessions List */}
-                  {isExpanded && (
+                  {(isExpanded || getAllSessions(project).length > 0) && (
                     <div className="ml-3 space-y-1 border-l border-border pl-3">
                       {!initialSessionsLoaded.has(project.name) ? (
                         // Loading skeleton for sessions
-                        Array.from({ length: 3 }).map((_, i) => (
+                        Array.from({ length: isExpanded ? 3 : 1 }).map((_, i) => (
                           <div key={i} className="p-2 rounded-md">
                             <div className="flex items-start gap-2">
                               <div className="w-3 h-3 bg-muted rounded-full animate-pulse mt-0.5" />
@@ -1041,7 +1051,10 @@ function Sidebar({
                           <p className="text-xs text-muted-foreground">No sessions yet</p>
                         </div>
                       ) : (
-                        getAllSessions(project).map((session) => {
+                        getAllSessions(project).filter((session, index) => {
+                          // Show all sessions if expanded, or just the first (most recent) if not
+                          return isExpanded || index === 0;
+                        }).map((session) => {
                           // Handle both Claude and Cursor session formats
                           const isCursorSession = session.__provider === 'cursor';
                           
