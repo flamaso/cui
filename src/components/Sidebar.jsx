@@ -211,11 +211,11 @@ function Sidebar({
     // Sort sessions based on user preference
     return allSessions.sort((a, b) => {
       if (sessionSortOrder === 'time') {
-        // Sort by most recent activity (descending)
+        // Sort by most recent activity (descending) - default
         const normalizeDate = (s) => new Date(s.__provider === 'cursor' ? s.createdAt : s.lastActivity);
         return normalizeDate(b) - normalizeDate(a);
       } else {
-        // Sort by name/summary (ascending)
+        // Sort by name (ascending)
         const aName = a.__provider === 'cursor' ? (a.name || 'Untitled') : (a.summary || 'New Session');
         const bName = b.__provider === 'cursor' ? (b.name || 'Untitled') : (b.summary || 'New Session');
         return aName.localeCompare(bName);
@@ -441,7 +441,7 @@ function Sidebar({
             </div>
             <div className="flex-1">
               <div className="flex items-center gap-2">
-                <span className="text-xs font-medium text-muted-foreground">Sessions:</span>
+                <span className="text-xs font-medium text-muted-foreground">Folder:</span>
                 <select
                   value={sessionSortOrder}
                   onChange={(e) => {
@@ -450,8 +450,8 @@ function Sidebar({
                   }}
                   className="text-xs px-2 py-1 bg-background border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer hover:bg-accent transition-colors"
                 >
-                  <option value="time">Recent First</option>
-                  <option value="name">Name (A-Z)</option>
+                  <option value="time">Latest First</option>
+                  <option value="name">Name A-Z</option>
                 </select>
               </div>
             </div>
