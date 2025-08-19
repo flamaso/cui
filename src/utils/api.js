@@ -40,7 +40,7 @@ export const api = {
   
   // Protected endpoints
   config: () => authenticatedFetch('/api/config'),
-  projects: () => authenticatedFetch('/api/projects'),
+  projects: (includeEmpty = false) => authenticatedFetch(`/api/projects${includeEmpty ? '?includeEmpty=true' : ''}`),
   sessions: (projectName, limit = 5, offset = 0) => 
     authenticatedFetch(`/api/projects/${projectName}/sessions?limit=${limit}&offset=${offset}`),
   sessionMessages: (projectName, sessionId, limit = null, offset = 0) => {

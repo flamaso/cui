@@ -243,7 +243,7 @@ async function extractProjectDirectory(projectName) {
   }
 }
 
-async function getProjects() {
+async function getProjects(includeEmpty = false) {
   const claudeDir = path.join(process.env.HOME, '.claude', 'projects');
   const config = await loadProjectConfig();
   const projects = [];
@@ -298,7 +298,11 @@ async function getProjects() {
           project.cursorSessions = [];
         }
         
-        projects.push(project);
+        // Filter empty projects unless includeEmpty is true
+        const totalSessions = (project.sessions?.length || 0) + (project.cursorSessions?.length || 0);
+        if (includeEmpty || totalSessions > 0 || project.sessionMeta?.total > 0) {
+          projects.push(project);
+        }
       }
     }
   } catch (error) {
@@ -341,7 +345,10 @@ async function getProjects() {
         console.warn(`Could not load Cursor sessions for manual project ${projectName}:`, e.message);
       }
       
-      projects.push(project);
+      // Filter manually added projects unless includeEmpty is true
+      if (includeEmpty || project.cursorSessions?.length > 0) {
+        projects.push(project);
+      }
     }
   }
   

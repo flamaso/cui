@@ -4,7 +4,7 @@ import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Input } from './ui/input';
 
-import { FolderOpen, Folder, Plus, MessageSquare, Clock, ChevronDown, ChevronRight, Edit3, Check, X, Trash2, Settings, FolderPlus, RefreshCw, Sparkles, Edit2, Star, Search } from 'lucide-react';
+import { FolderOpen, Folder, Plus, MessageSquare, Clock, ChevronDown, ChevronRight, Edit3, Check, X, Trash2, Settings, FolderPlus, RefreshCw, Sparkles, Edit2, Star, Search, Eye, EyeOff } from 'lucide-react';
 import { cn } from '../lib/utils';
 import ClaudeLogo from './ClaudeLogo';
 import CursorLogo from './CursorLogo.jsx';
@@ -69,6 +69,9 @@ function Sidebar({
   const [editingSessionName, setEditingSessionName] = useState('');
   const [generatingSummary, setGeneratingSummary] = useState({});
   const [searchFilter, setSearchFilter] = useState('');
+  const [showEmptyFolders, setShowEmptyFolders] = useState(() => {
+    return localStorage.getItem('showEmptyFolders') === 'true';
+  });
 
   
   // Starred projects state - persisted in localStorage
@@ -417,8 +420,14 @@ function Sidebar({
     }
   };
 
-  // Filter projects based on search input
+  // Filter projects based on search input and empty folders setting
   const filteredProjects = sortedProjects.filter(project => {
+    // Filter empty folders if showEmptyFolders is false
+    if (!showEmptyFolders) {
+      const totalSessions = getAllSessions(project).length;
+      if (totalSessions === 0) return false;
+    }
+    
     if (!searchFilter.trim()) return true;
     
     const searchLower = searchFilter.toLowerCase();
@@ -457,6 +466,23 @@ function Sidebar({
             </div>
           </div>
           <div className="flex gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-9 w-9 px-0 hover:bg-accent transition-colors duration-200"
+              onClick={() => {
+                const newValue = !showEmptyFolders;
+                setShowEmptyFolders(newValue);
+                localStorage.setItem('showEmptyFolders', newValue.toString());
+              }}
+              title={showEmptyFolders ? "Hide empty folders" : "Show empty folders"}
+            >
+              {showEmptyFolders ? (
+                <Eye className="w-4 h-4" />
+              ) : (
+                <EyeOff className="w-4 h-4" />
+              )}
+            </Button>
             <Button
               variant="ghost"
               size="sm"

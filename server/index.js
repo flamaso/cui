@@ -198,7 +198,8 @@ app.get('/api/config', authenticateToken, (req, res) => {
 
 app.get('/api/projects', authenticateToken, async (req, res) => {
     try {
-        const projects = await getProjects();
+        const includeEmpty = req.query.includeEmpty === 'true';
+        const projects = await getProjects(includeEmpty);
         res.json(projects);
     } catch (error) {
         res.status(500).json({ error: error.message });
