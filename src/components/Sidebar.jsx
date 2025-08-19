@@ -60,6 +60,10 @@ function Sidebar({
   const [initialSessionsLoaded, setInitialSessionsLoaded] = useState(new Set());
   const [currentTime, setCurrentTime] = useState(new Date());
   const [projectSortOrder, setProjectSortOrder] = useState('name');
+  const [sessionSortOrder, setSessionSortOrder] = useState(() => {
+    const saved = localStorage.getItem('sessionSortOrder');
+    return saved || 'time';
+  });
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [editingSession, setEditingSession] = useState(null);
   const [editingSessionName, setEditingSessionName] = useState('');
@@ -202,9 +206,21 @@ function Sidebar({
     // Combine Claude and Cursor sessions; Sidebar will display icon per row
     const claudeSessions = [...(project.sessions || []), ...(additionalSessions[project.name] || [])].map(s => ({ ...s, __provider: 'claude' }));
     const cursorSessions = (project.cursorSessions || []).map(s => ({ ...s, __provider: 'cursor' }));
-    // Sort by most recent activity/date
-    const normalizeDate = (s) => new Date(s.__provider === 'cursor' ? s.createdAt : s.lastActivity);
-    return [...claudeSessions, ...cursorSessions].sort((a, b) => normalizeDate(b) - normalizeDate(a));
+    const allSessions = [...claudeSessions, ...cursorSessions];
+    
+    // Sort sessions based on user preference
+    return allSessions.sort((a, b) => {
+      if (sessionSortOrder === 'time') {
+        // Sort by most recent activity (descending)
+        const normalizeDate = (s) => new Date(s.__provider === 'cursor' ? s.createdAt : s.lastActivity);
+        return normalizeDate(b) - normalizeDate(a);
+      } else {
+        // Sort by name/summary (ascending)
+        const aName = a.__provider === 'cursor' ? (a.name || 'Untitled') : (a.summary || 'New Session');
+        const bName = b.__provider === 'cursor' ? (b.name || 'Untitled') : (b.summary || 'New Session');
+        return aName.localeCompare(bName);
+      }
+    });
   };
 
   // Helper function to get the last activity date for a project
@@ -423,9 +439,21 @@ function Sidebar({
             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center shadow-sm">
               <MessageSquare className="w-4 h-4 text-primary-foreground" />
             </div>
-            <div>
-              <h1 className="text-lg font-bold text-foreground">Claude Code UI</h1>
-              <p className="text-sm text-muted-foreground">AI coding assistant interface</p>
+            <div className="flex-1">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-medium text-muted-foreground">Sessions:</span>
+                <select
+                  value={sessionSortOrder}
+                  onChange={(e) => {
+                    setSessionSortOrder(e.target.value);
+                    localStorage.setItem('sessionSortOrder', e.target.value);
+                  }}
+                  className="text-xs px-2 py-1 bg-background border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer hover:bg-accent transition-colors"
+                >
+                  <option value="time">Recent First</option>
+                  <option value="name">Name (A-Z)</option>
+                </select>
+              </div>
             </div>
           </div>
           <div className="flex gap-2">
@@ -465,9 +493,18 @@ function Sidebar({
               <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
                 <MessageSquare className="w-4 h-4 text-primary-foreground" />
               </div>
-              <div>
-                <h1 className="text-lg font-semibold text-foreground">Claude Code UI</h1>
-                <p className="text-sm text-muted-foreground">Projects</p>
+              <div className="flex-1">
+                <select
+                  value={sessionSortOrder}
+                  onChange={(e) => {
+                    setSessionSortOrder(e.target.value);
+                    localStorage.setItem('sessionSortOrder', e.target.value);
+                  }}
+                  className="text-xs px-2 py-1 bg-background border border-border rounded-md focus:outline-none focus:ring-1 focus:ring-primary w-full"
+                >
+                  <option value="time">Recent</option>
+                  <option value="name">Name</option>
+                </select>
               </div>
             </div>
             <div className="flex gap-2">
