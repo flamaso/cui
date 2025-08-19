@@ -22,6 +22,7 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate, useParams } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import MainContent from './components/MainContent';
+import ResizablePanel from './components/ResizablePanel';
 import MobileNav from './components/MobileNav';
 import ToolsSettings from './components/ToolsSettings';
 import QuickSettingsPanel from './components/QuickSettingsPanel';
@@ -30,7 +31,6 @@ import { useWebSocket } from './utils/websocket';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
-import { useVersionCheck } from './hooks/useVersionCheck';
 import { api, authenticatedFetch } from './utils/api';
 
 
@@ -39,8 +39,6 @@ function AppContent() {
   const navigate = useNavigate();
   const { sessionId } = useParams();
   
-  const { updateAvailable, latestVersion, currentVersion } = useVersionCheck('siteboon', 'claudecodeui');
-  const [showVersionModal, setShowVersionModal] = useState(false);
   
   const [projects, setProjects] = useState([]);
   const [selectedProject, setSelectedProject] = useState(null);
@@ -68,6 +66,21 @@ function AppContent() {
     const saved = localStorage.getItem('sendByCtrlEnter');
     return saved !== null ? JSON.parse(saved) : false;
   });
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+  // Keyboard shortcut for sidebar toggle
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      // Cmd/Ctrl + B to toggle sidebar
+      if ((e.metaKey || e.ctrlKey) && e.key === 'b') {
+        e.preventDefault();
+        setSidebarCollapsed(prev => !prev);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
   // Session Protection System: Track sessions with active conversations to prevent
   // automatic project updates from interrupting ongoing chats. When a user sends
   // a message, the session is marked as "active" and project updates are paused
@@ -541,7 +554,10 @@ function AppContent() {
     <div className="fixed inset-0 flex bg-background">
       {/* Fixed Desktop Sidebar */}
       {!isMobile && (
-        <div className="w-80 flex-shrink-0 border-r border-border bg-card">
+        <ResizablePanel
+          isCollapsed={sidebarCollapsed}
+          className="border-r border-border bg-card"
+        >
           <div className="h-full overflow-hidden">
             <Sidebar
               projects={projects}
@@ -555,13 +571,9 @@ function AppContent() {
               isLoading={isLoadingProjects}
               onRefresh={handleSidebarRefresh}
               onShowSettings={() => setShowToolsSettings(true)}
-              updateAvailable={updateAvailable}
-              latestVersion={latestVersion}
-              currentVersion={currentVersion}
-              onShowVersionModal={() => setShowVersionModal(true)}
             />
           </div>
-        </div>
+        </ResizablePanel>
       )}
 
       {/* Mobile Sidebar Overlay */}
@@ -600,10 +612,6 @@ function AppContent() {
               isLoading={isLoadingProjects}
               onRefresh={handleSidebarRefresh}
               onShowSettings={() => setShowToolsSettings(true)}
-              updateAvailable={updateAvailable}
-              latestVersion={latestVersion}
-              currentVersion={currentVersion}
-              onShowVersionModal={() => setShowVersionModal(true)}
             />
           </div>
         </div>
@@ -621,6 +629,8 @@ function AppContent() {
           messages={messages}
           isMobile={isMobile}
           onMenuClick={() => setSidebarOpen(true)}
+          onToggleSidebar={() => setSidebarCollapsed(prev => !prev)}
+          sidebarCollapsed={sidebarCollapsed}
           isLoading={isLoadingProjects}
           onInputFocusChange={setIsInputFocused}
           onSessionActive={markSessionAsActive}
@@ -679,8 +689,6 @@ function AppContent() {
         projects={projects}
       />
 
-      {/* Version Upgrade Modal */}
-      <VersionUpgradeModal />
     </div>
   );
 }

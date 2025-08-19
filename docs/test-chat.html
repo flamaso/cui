@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Claude Chat</title>
+</head>
+<body>
+    <h1>Testing Claude Code UI Chat</h1>
+    <div id="status">Checking connection...</div>
+    <button onclick="testChat()">Test Chat Message</button>
+    <pre id="output"></pre>
+
+    <script>
+        const token = localStorage.getItem('auth-token');
+        const status = document.getElementById('status');
+        const output = document.getElementById('output');
+        
+        if (!token) {
+            status.textContent = '❌ No auth token found. Please login first.';
+        } else {
+            status.textContent = '✅ Auth token found';
+        }
+        
+        function testChat() {
+            const ws = new WebSocket(`ws://localhost:3008/ws?token=${encodeURIComponent(token)}`);
+            
+            ws.onopen = () => {
+                output.textContent += 'WebSocket connected\n';
+                
+                // Send test message
+                ws.send(JSON.stringify({
+                    type: 'claude-command',
+                    command: 'Hello, can you see this?',
+                    options: {
+                        projectPath: localStorage.getItem('lastProjectPath') || '.',
+                        cwd: '.',
+                        sessionId: null,
+                        resume: false
+                    }
+                }));
+            };
+            
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                output.textContent += `Received: ${JSON.stringify(data, null, 2)}\n`;
+            };
+            
+            ws.onerror = (error) => {
+                output.textContent += `Error: ${error}\n`;
+            };
+        }
+    </script>
+</body>
+</html>

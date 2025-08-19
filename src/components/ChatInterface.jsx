@@ -3342,8 +3342,16 @@ function ChatInterface({ selectedProject, selectedSession, ws, sendMessage, mess
               placeholder="Ask Claude to help with your code... (@ to reference files)"
               disabled={isLoading}
               rows={1}
-              className="chat-input-placeholder w-full pl-12 pr-28 sm:pr-40 py-3 sm:py-4 bg-transparent rounded-2xl focus:outline-none text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 disabled:opacity-50 resize-none min-h-[40px] sm:min-h-[56px] max-h-[40vh] sm:max-h-[300px] overflow-y-auto text-sm sm:text-base transition-all duration-200"
-              style={{ height: 'auto' }}
+              className="chat-input-placeholder w-full pl-12 pr-28 sm:pr-40 py-3 sm:py-4 bg-transparent rounded-2xl focus:outline-none text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 disabled:opacity-50 resize-vertical min-h-[56px] max-h-[50vh] overflow-y-auto text-sm sm:text-base transition-all duration-200"
+              style={{ 
+                height: localStorage.getItem('chatInputHeight') || '56px',
+                minHeight: '56px',
+                maxHeight: '50vh'
+              }}
+              onMouseUp={(e) => {
+                // Save height preference when user finishes resizing
+                localStorage.setItem('chatInputHeight', e.target.style.height);
+              }}
             />
             {/* Clear button - shown when there's text */}
             {input.trim() && (

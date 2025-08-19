@@ -33,6 +33,8 @@ function MainContent({
   onMenuClick,
   isLoading,
   onInputFocusChange,
+  onToggleSidebar,
+  sidebarCollapsed,
   // Session Protection Props: Functions passed down from App.jsx to manage active session state
   // These functions control when project updates are paused during active conversations
   onSessionActive,        // Mark session as active when user sends message
@@ -141,6 +143,22 @@ function MainContent({
       <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-3 sm:p-4 flex-shrink-0">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2 sm:space-x-3">
+            {/* Sidebar Toggle Button - Desktop Only */}
+            {!isMobile && (
+              <button
+                onClick={onToggleSidebar}
+                className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white rounded-md hover:bg-gray-100 dark:hover:bg-gray-700"
+                title="Toggle sidebar (Cmd/Ctrl+B)"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  {sidebarCollapsed ? (
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+                  ) : (
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+                  )}
+                </svg>
+              </button>
+            )}
             {isMobile && (
               <button
                 onClick={onMenuClick}
@@ -213,7 +231,7 @@ function MainContent({
                   <svg className="w-3 sm:w-3.5 h-3 sm:h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                   </svg>
-                  <span className="hidden sm:inline">Chat</span>
+                  <span className="hidden min-[900px]:inline">Chat</span>
                 </span>
               </button>
               <button
@@ -228,7 +246,7 @@ function MainContent({
                   <svg className="w-3 sm:w-3.5 h-3 sm:h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z" />
                   </svg>
-                  <span className="hidden sm:inline">Shell</span>
+                  <span className="hidden min-[900px]:inline">Shell</span>
                 </span>
               </button>
               <button
@@ -243,7 +261,7 @@ function MainContent({
                   <svg className="w-3 sm:w-3.5 h-3 sm:h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-5l-2-2H5a2 2 0 00-2 2z" />
                   </svg>
-                  <span className="hidden sm:inline">Files</span>
+                  <span className="hidden min-[900px]:inline">Files</span>
                 </span>
               </button>
               <button
@@ -258,7 +276,7 @@ function MainContent({
                   <svg className="w-3 sm:w-3.5 h-3 sm:h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
-                  <span className="hidden sm:inline">Source Control</span>
+                  <span className="hidden min-[900px]:inline">Source Control</span>
                 </span>
               </button>
                {/* <button

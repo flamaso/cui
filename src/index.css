@@ -643,6 +643,23 @@
     scrollbar-color: rgba(156, 163, 175, 0.3) transparent;
   }
   
+  /* Custom styles for resizable textarea */
+  textarea.resize-vertical {
+    resize: vertical !important;
+  }
+  
+  /* Style resize handle */
+  textarea.resize-vertical::-webkit-resizer {
+    background-color: transparent;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg width='10' height='10' viewBox='0 0 10 10' fill='none' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M9 9L1 1M9 5L5 1M9 1L9 1' stroke='%236B7280' stroke-width='1.5' stroke-linecap='round'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: bottom 2px right 2px;
+  }
+  
+  .dark textarea.resize-vertical::-webkit-resizer {
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg width='10' height='10' viewBox='0 0 10 10' fill='none' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M9 9L1 1M9 5L5 1M9 1L9 1' stroke='%239CA3AF' stroke-width='1.5' stroke-linecap='round'/%3e%3c/svg%3e");
+  }
+  
   .chat-input-placeholder::-webkit-scrollbar {
     width: 6px;
   }
