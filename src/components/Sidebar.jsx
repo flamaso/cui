@@ -449,7 +449,7 @@ function Sidebar({
   });
 
   return (
-    <div className="h-full flex flex-col bg-card md:select-none">
+    <div className="h-full flex flex-col bg-card">
       {/* Header */}
       <div className="md:p-4 md:border-b md:border-border">
         {/* Desktop Header */}
@@ -1094,16 +1094,6 @@ function Sidebar({
                                 })}
                               >
                                 <div className="flex items-center gap-2">
-                                  <div className={cn(
-                                    "w-5 h-5 rounded-md flex items-center justify-center flex-shrink-0",
-                                    selectedSession?.id === session.id ? "bg-primary/10" : "bg-muted/50"
-                                  )}>
-                                    {isCursorSession ? (
-                                      <CursorLogo className="w-3 h-3" />
-                                    ) : (
-                                      <ClaudeLogo className="w-3 h-3" />
-                                    )}
-                                  </div>
                                   <div className="min-w-0 flex-1">
                                     <div className="text-xs font-medium truncate text-foreground">
                                       {sessionName}
@@ -1157,11 +1147,6 @@ function Sidebar({
                                 onTouchEnd={handleTouchClick(() => onSessionSelect(session))}
                               >
                                 <div className="flex items-start gap-2 min-w-0 w-full">
-                                  {isCursorSession ? (
-                                    <CursorLogo className="w-3 h-3 mt-0.5 flex-shrink-0" />
-                                  ) : (
-                                    <ClaudeLogo className="w-3 h-3 mt-0.5 flex-shrink-0" />
-                                  )}
                                   <div className="min-w-0 flex-1">
                                     <div className="text-xs font-medium truncate text-foreground">
                                       {sessionName}
